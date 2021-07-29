@@ -2,3 +2,4 @@ cover.jpg
 image.jpg
 .DS_Store
 fonts/
+__pycache__/
