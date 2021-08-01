@@ -1,5 +1,3 @@
-#TODO: control for file format; also for non-English citations
-
 import config
 from core import *
 
