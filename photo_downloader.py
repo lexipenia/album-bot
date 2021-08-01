@@ -11,7 +11,7 @@ class PhotoDownloader():
         options = Options()
         options.add_argument("--no-sandbox")
         options.add_argument("--remote-debugging-port=9222") # https://stackoverflow.com/a/56638103/13100363
-        #options.add_argument("--headless")
+        options.add_argument("--headless")
         options.add_argument("--disable-dev-shm-usage")
         self.driver = webdriver.Chrome("/usr/local/bin/chromedriver",options=options)
         self.driver.implicitly_wait(10)
@@ -29,8 +29,8 @@ class PhotoDownloader():
         sites = [                           # functions are objects, so we can name them
             self.flickr,                    # and treat them like this, then call below with ()
             self.stocksnap,
-            self.unsplash,
-            self.pixabay
+            self.unsplash
+            #self.pixabay
         ]
         choice(sites)()                     # calls the chosen function
 

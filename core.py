@@ -1,6 +1,7 @@
 from sys import argv
 from random import choice, choices, randint
 from math import floor
+from statistics import mean, stdev
 import requests
 import re
 
@@ -114,39 +115,56 @@ def createAlbumCover(band,title):
 
     print("Adding text to image…")
 
-    # set up image and choose a random font at 75pt
+    # set up image and crop to square
     image = Image.open(config.path_extension + "image.jpg")
-    font = ImageFont.truetype(config.path_extension + "fonts/" + choice(fonts), 75, encoding="UTF-8")
-
     image = cropImageToSquare(image)
-    
-    # scale the image so that the longest text item just fits on, or width is 1000
-    w, h = image.size
-    length_band = font.getsize(band)[0]
-    length_title = font.getsize(title)[0]
-    max_width = max(length_band,length_title)
-    big_image = False
 
-    if max_width > 900:         # scale image all the way up to accomodate
+    # choose a random font of size 75, calculate size of text area
+    font = ImageFont.truetype(config.path_extension + "fonts/" + choice(fonts), 75, encoding="UTF-8")
+    size_band = font.getsize(band)
+    size_title = font.getsize(title)
+    size_text = (max(size_band[0],size_title[0]),(size_band[1]+size_title[1]))
+
+    #scale to size so that the longest text item just fits on, or width is 900
+    max_width = size_text[0]
+    big_image = False
+    if max_width > 800:         # scale image all the way up to accomodate
         image = scaleImageWidth(image,max_width+100)
         big_image = True
     else:                       # scale image to 900
         image = scaleImageWidth(image,900)
 
+    # variable for offset of text from corner + specify start points for width and height loops
+    corner_offset = 25
+    w,h = image.size
+    image_areas = {
+        "TL": (corner_offset,corner_offset),
+        "TR": ((w - corner_offset - size_text[0]),corner_offset),
+        "BL": (corner_offset,(h - corner_offset - size_text[1])),
+        "BR": ((w - corner_offset - size_text[0]),(h - corner_offset - size_text[1]))
+    }
+
+    # analyze the image to find out where is best for text + whether to use black or white
+    # will get a tuple of form ("TR",123) showing chosen corner + average b/w pixel value
+    chosen_corner = analyzeImage(image,size_text,image_areas)
+
+    # set text colour to black if the chosen corner is on average brighter, otherwise white
+    if chosen_corner[1] < 128:
+        fill_colour = (255,255,255)
+    else:
+        fill_colour = (0,0,0)
+
+    # add the text to the image, choosing left/right alignment appropriately
     draw = ImageDraw.Draw(image)
+    if chosen_corner[0] == "TR" or chosen_corner[0] == "BR":
+        draw.multiline_text(image_areas[chosen_corner[0]],band + "\n" + title,font=font,fill=fill_colour,align="right")
+    else:
+        draw.multiline_text(image_areas[chosen_corner[0]],band + "\n" + title,font=font,fill=fill_colour)
 
-    fill_colour = (0, 0, 0)
-    stroke_colour = (0, 0, 0)
-
-    # draw the image
-    draw.multiline_text((10,10),band + "\n" + title,font=font,fill=fill_colour)
-
-    # scale back down to 1000px before saving
+    # scale back down to 900px (if necessary) before saving
     if big_image:
         image = scaleImageWidth(image,900)
-
     image.save(config.path_extension + "cover.jpg")
-
     print("Text added successfully!")
 
 # crop an image to a square
@@ -173,6 +191,27 @@ def scaleImageWidth(image,width):
     scale_factor = width / w
     w, h = map(lambda x: int(floor(x * scale_factor)), (w, h))
     return image.resize((w,h),Image.ANTIALIAS)
+
+# test four image areas (TL,TR,BL,BR) that are the size of the text area and offset from the main corners.
+# determine: (a) which corner has the least variation between light and dark; (b) if the corner is more light or dark
+def analyzeImage(image,size_text,image_areas):
+
+    pixels = image.load()
+
+    # for each area record the average b/w pixel value (light/dark) + standard deviation of these values
+    areas = {}
+    for area, start_coords in image_areas.items():
+        b_w_values = []     # value of each b_w_pixel
+        for pixel_w in range(start_coords[0],start_coords[0] + size_text[0] + 1):
+            for pixel_h in range(start_coords[1],start_coords[1] + size_text[1] + 1):
+                r,g,b = pixels[pixel_w,pixel_h]
+                b_w_pixel = mean([r,g,b])
+                b_w_values.append(b_w_pixel)
+        areas[area] = (stdev(b_w_values),mean(b_w_values))
+    
+    # return the most uniform area (lowest stdev) and its b/w pixel average
+    most_uniform = (min(areas, key = lambda key : areas[key][0]))
+    return (most_uniform,areas[most_uniform][1])
 
 # add the review + other information to the cover, create 1600 x 900 image
 def createTwitterImage(band,title,review):

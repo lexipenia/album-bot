@@ -1,3 +1,5 @@
+#TODO: control for file format; also for non-English citations
+
 import config
 from core import *
 
@@ -12,4 +14,3 @@ def run():
     print(review["quote"],"–",review["magazine"])
 
 run()
-#createAlbumCover("band","title")
