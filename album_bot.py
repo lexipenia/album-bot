@@ -31,6 +31,10 @@ def run():
     print("Creating Twitter image with review…")
     createTwitterImage(review)
     print("Twitter image created successfully.")
+
+    print("Posting tweet…")
+    postTweet(band,title)
+    print("Tweet sent successfully!")
     
     print("---\n\"" + title + "\" by " + band)
     print(review["quote"],"–",review["magazine"])

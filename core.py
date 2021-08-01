@@ -13,6 +13,7 @@ from PIL import Image, ImageFont, ImageDraw
 import tweepy
 
 import config
+from api_keys import *
 from photo_downloader import PhotoDownloader
 from adjectives import *
 from magazines import *
@@ -245,3 +246,28 @@ def createTwitterImage(review):
     final.paste(stars,(int(floor(1250-stars.width/2)),700))
 
     final.save(config.path_extension + "final.jpg")
+
+# post everything to twitter
+def postTweet(band,title):
+
+    text = "“" + title + "” by " + band
+
+    # authenticate and set up the Twitter bot
+    try:
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(access_token, access_token_secret)
+        twitter = tweepy.API(auth)
+    except Exception as e:
+        print("Error authenticating with Twitter:",e)
+
+    # upload the image
+    try:
+        review_image = twitter.media_upload(config.path_extension + "final.jpg")
+    except Exception as e:
+        print("Error uploading image:",e)
+
+    # post the tweet with text
+    try:
+        twitter.update_status(status=text,media_ids=[review_image.media_id])
+    except Exception as e:
+        print("Error posting tweet:",e)
