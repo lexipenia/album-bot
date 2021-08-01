@@ -8,7 +8,6 @@ import re
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 from PIL import Image, ImageFont, ImageDraw
 import tweepy
@@ -84,7 +83,7 @@ def stripEndCharacters(text):
 
 # extract the final n words and format the quote
 def extractPhrase(quote):
-    tokenized_quote = quote.split(" ")
+    tokenized_quote = re.sub("[\s]{2,}"," ",quote).split(" ")   # regex control for multiple spaces
     length = randint(1,5)
     if length > len(tokenized_quote):
         return quote
@@ -129,7 +128,7 @@ def createAlbumCover(band,title):
         image = scaleImageWidth(image,900)
 
     # variable for offset of text from corner + specify start points for width and height loops
-    corner_offset = 25
+    corner_offset = 30
     w,h = image.size
     image_areas = {
         "TL": (corner_offset,corner_offset),

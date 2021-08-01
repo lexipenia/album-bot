@@ -29,7 +29,7 @@ class PhotoDownloader():
             self.flickr,                    # and treat them like this, then call below with ()
             self.stocksnap,
             self.unsplash
-            #self.pixabay                   # too slow
+            #self.pixabay                   # remove for now; it's too slow
         ]
         choice(sites)()                     # calls the chosen function
 
@@ -52,7 +52,7 @@ class PhotoDownloader():
         for element in image_elements:
             image_urls.append(element.get_attribute("href"))
         if image_urls == []:
-            return self.flickr()
+            return self.download_from_random_site()     # maybe try another site; in case this is broken
         else:
             image_url = choice(image_urls)
 
@@ -75,7 +75,7 @@ class PhotoDownloader():
             if element.get_attribute("class") == "photo-grid-item":      # exclude sponsored
                 image_urls.append(element.find_element_by_tag_name("a").get_attribute("href"))
         if image_urls == []:
-            return self.stocksnap()
+            return self.download_from_random_site()
         else:
             image_url = choice(image_urls)
         
@@ -98,7 +98,7 @@ class PhotoDownloader():
                 image_urls.append(element.get_attribute("src"))
 
         if image_urls == []:
-            return self.unsplash()
+            return self.download_from_random_site()
         else:
             image_url = choice(image_urls)
         
@@ -117,7 +117,7 @@ class PhotoDownloader():
         for element in image_elements:
             image_urls.append(element.find_element_by_tag_name("a").get_attribute("href"))
         if image_urls == []:
-            return self.pixabay()
+            return self.download_from_random_site()
         else:
             image_url = choice(image_urls)
         

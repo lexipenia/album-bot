@@ -35,4 +35,10 @@ def run():
     print("---\n\"" + title + "\" by " + band)
     print(review["quote"],"–",review["magazine"])
 
-run()
+# Just quit if anything goes wrong; all the elements have to work for a result to be produced
+try:
+    run()
+except Exception as e:
+    print("An error occurred:",e)
+    print("Quitting…")
+    exit()
