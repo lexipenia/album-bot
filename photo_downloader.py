@@ -22,7 +22,6 @@ class PhotoDownloader():
         with requests.get(source_url, stream=True) as r:
             with open(path, "wb") as f:
                 f.write(r.content)
-        print("Image downloaded.")
 
     # choose a photo site and execute the function to download from it
     def download_from_random_site(self):
@@ -30,7 +29,7 @@ class PhotoDownloader():
             self.flickr,                    # and treat them like this, then call below with ()
             self.stocksnap,
             self.unsplash
-            #self.pixabay
+            #self.pixabay                   # too slow
         ]
         choice(sites)()                     # calls the chosen function
 

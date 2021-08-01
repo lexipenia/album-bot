@@ -1,4 +1,5 @@
 from sys import argv
+from datetime import datetime
 from random import choice, choices, randint
 from math import floor
 from statistics import mean, stdev
@@ -27,8 +28,6 @@ def setPathExtension():
 
 # get the title of a random Wikipedia article as a band name
 def generateBandName():
-
-    print("Generating band name…")
     
     random_page = requests.get("https://en.wikipedia.org/wiki/Special:Random")
     soup = BeautifulSoup(random_page.content, "html.parser")
@@ -46,7 +45,6 @@ def generateBandName():
 
 # use the tail of a random quotation for the album name
 def generateAlbumTitle():
-    print("Generating album title…")
     quote = getRandomQuote()
     return extractPhrase(stripEndCharacters(quote))
     
@@ -74,7 +72,7 @@ def getRandomQuote():
         return choice(quotes)
     else:
         print("No quotes found. Trying again…")
-        return generateAlbumTitle()
+        return getRandomQuote()
 
 # strip out unwanted characters at the end
 def stripEndCharacters(text):
@@ -94,26 +92,22 @@ def extractPhrase(quote):
         return " ".join(tokenized_quote[-length:]).title()
 
 def generateAlbumReview():
-    print("Generating review…")
     random_adjs = choices(adjectives,k=3)
     review = {
+        "adjectives": random_adjs,
         "quote": "\"" + random_adjs[0].capitalize() + ", " + random_adjs[1] + ", " + random_adjs[2] + "\"",
         "magazine": choice(magazines),
-        "rating": randint(1,10)
     }
     return review
 
 # download a square image from flickr to use
 def getImage():
-    print("Downloading an image…")
     downloader = PhotoDownloader()
     downloader.download_from_random_site()
     downloader.driver.quit()        # ensure port closes; https://stackoverflow.com/a/67001770/13100363
 
 # add the band name and album title to the image
 def createAlbumCover(band,title):
-
-    print("Adding text to image…")
 
     # set up image and crop to square
     image = Image.open(config.path_extension + "image.jpg")
@@ -128,7 +122,7 @@ def createAlbumCover(band,title):
     #scale to size so that the longest text item just fits on, or width is 900
     max_width = size_text[0]
     big_image = False
-    if max_width > 800:         # scale image all the way up to accomodate
+    if max_width > 800:         # scale image all the way up to accommodate
         image = scaleImageWidth(image,max_width+100)
         big_image = True
     else:                       # scale image to 900
@@ -165,7 +159,6 @@ def createAlbumCover(band,title):
     if big_image:
         image = scaleImageWidth(image,900)
     image.save(config.path_extension + "cover.jpg")
-    print("Text added successfully!")
 
 # crop an image to a square
 def cropImageToSquare(image):
@@ -210,9 +203,46 @@ def analyzeImage(image,size_text,image_areas):
         areas[area] = (stdev(b_w_values),mean(b_w_values))
     
     # return the most uniform area (lowest stdev) and its b/w pixel average
-    most_uniform = (min(areas, key = lambda key : areas[key][0]))
+    most_uniform = (min(areas, key = lambda value : areas[value][0]))
     return (most_uniform,areas[most_uniform][1])
 
 # add the review + other information to the cover, create 1600 x 900 image
-def createTwitterImage(band,title,review):
-    pass
+def createTwitterImage(review):
+    
+    # set up black image and add existing cover
+    final = Image.new("RGB",(1600,900))
+    cover = Image.open(config.path_extension + "cover.jpg")
+    final.paste(cover)
+
+    # use Goudy for all reviews; 50 will fit on the largest adjective: "naked as the day you were born"
+    font = ImageFont.truetype(config.path_extension + "fonts/Goudy Old Style Regular.ttf", 50, encoding="UTF-8")
+
+    draw = ImageDraw.Draw(final)
+
+    # add each adjective, centered, in an appropriate place, with punctuation
+    # "align=center" is broken, hence having to calculate separately for each adjective
+    size_adj = font.getsize(review["adjectives"][0])
+    text_start = (700-size_adj[0])/2 + 900
+    draw.text((text_start,200),text=review["adjectives"][0].capitalize() + ",",font=font,fill=(255,255,255))
+    
+    size_adj = font.getsize(review["adjectives"][1])
+    text_start = (700-size_adj[0])/2 + 900
+    draw.text((text_start,300),text=review["adjectives"][1] + ",",font=font,fill=(255,255,255))
+
+    size_adj = font.getsize(review["adjectives"][2])
+    text_start = (700-size_adj[0])/2 + 900
+    draw.text((text_start,400),text=review["adjectives"][2] + ".",font=font,fill=(255,255,255))
+
+    # add magazine, change font to ITALIC version
+    font = ImageFont.truetype(config.path_extension + "fonts/Goudy Old Style ITALIC.ttf", 50, encoding="UTF-8")
+    string_magazine = "— " + review["magazine"]
+    length_magazine = font.getsize(string_magazine)
+    text_start = (700-length_magazine[0])/2 + 900
+    draw.multiline_text((text_start,550),text=string_magazine,font=font,fill=(255,255,255))
+
+    # add stars, centered
+    rating = randint(1,10)
+    stars = Image.open(config.path_extension + "stars/" + str(rating) + ".png")
+    final.paste(stars,(int(floor(1250-stars.width/2)),700))
+
+    final.save(config.path_extension + "final.jpg")
