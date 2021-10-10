@@ -10,3 +10,13 @@ The bot is on Twitter here: https://twitter.com/bot_album
 
 `pip install unidecode selenium beautifulsoup4 pillow tweepy`
 
+If you want to run the bot, you'll have to provide the fonts contained in the `fonts_list.py` file (or choose your own fonts and modify the list).
+
+Twitter API keys need to be supplied in a file called `api_key.py` with this format:
+
+```
+consumer_key = ""
+consumer_secret = ""
+access_token = ""
+access_token_secret = ""
+```
