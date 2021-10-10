@@ -12,7 +12,7 @@ The bot is on Twitter here: https://twitter.com/bot_album
 
 If you want to run the bot, you'll have to provide the fonts contained in the `fonts_list.py` file (or choose your own fonts and modify the list).
 
-Twitter API keys need to be supplied in a file called `api_key.py` with this format:
+Twitter API keys need to be supplied in a file called `api_keys.py` with this format:
 
 ```
 consumer_key = ""
