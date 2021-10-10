@@ -23,7 +23,7 @@ def run():
     print("Image downloaded.")
 
     print("Creating a cover…")
-    createAlbumCover(band,title)
+    createAlbumCover(unidecode(band),unidecode(title))  # remove accented characters in case fonts lack support
     print("Cover created.")
 
     print("Creating Twitter image with review…")

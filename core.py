@@ -6,6 +6,7 @@ from statistics import mean, stdev
 import requests
 import re
 
+from unidecode import unidecode
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
@@ -63,7 +64,7 @@ def getRandomQuote():
         if len(element.text) > 0:                   # avoid error if empty    
             if element.text[0] in "1234567890":     # skip numbered subheaders
                 continue
-            elif element.ul:  # where sub-list gives attribution           
+            elif element.ul:  # identify a quote because a sub-list gives attribution           
                     element.ul.decompose()
                     quotes.append(element.text.replace("\\n", " ").strip())
 

@@ -11,7 +11,7 @@ class PhotoDownloader():
         options = Options()
         options.add_argument("--no-sandbox")
         options.add_argument("--remote-debugging-port=9222") # https://stackoverflow.com/a/56638103/13100363
-        options.add_argument("--headless")
+        #options.add_argument("--headless")
         options.add_argument("--disable-dev-shm-usage")
         self.driver = webdriver.Chrome("/usr/local/bin/chromedriver",options=options)
         self.driver.implicitly_wait(10)
@@ -31,7 +31,7 @@ class PhotoDownloader():
             self.unsplash
             #self.pixabay                   # remove for now; it's too slow
         ]
-        choice(sites)()                     # calls the chosen function
+        choices(sites,weights=[0.1,0.45,0.45],k=1)[0]()     # calls the chosen function, weight against flickr
 
     # tailored routines to download from the individual sites; all quite similar
     def flickr(self):
@@ -52,7 +52,7 @@ class PhotoDownloader():
         for element in image_elements:
             image_urls.append(element.get_attribute("href"))
         if image_urls == []:
-            return self.download_from_random_site()     # maybe try another site; in case this is broken
+            return self.download_from_random_site()     # maybe try another site in case this is broken (cannot repeat one site)
         else:
             image_url = choice(image_urls)
 
