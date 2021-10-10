@@ -11,7 +11,7 @@ class PhotoDownloader():
         options = Options()
         options.add_argument("--no-sandbox")
         options.add_argument("--remote-debugging-port=9222") # https://stackoverflow.com/a/56638103/13100363
-        #options.add_argument("--headless")
+        options.add_argument("--headless")
         options.add_argument("--disable-dev-shm-usage")
         self.driver = webdriver.Chrome("/usr/local/bin/chromedriver",options=options)
         self.driver.implicitly_wait(10)
@@ -89,6 +89,8 @@ class PhotoDownloader():
 
         url = "https://unsplash.com/s/photos/" + choice(adjectives).replace(" ", "%20")
         self.driver.get(url)
+
+        sleep(1)    # required for unsplash to avoid "stale element reference" when running remotely
         
         image_elements = self.driver.find_elements_by_class_name("oCCRx")
 
@@ -110,7 +112,7 @@ class PhotoDownloader():
 
         url = "https://pixabay.com/images/search/" + choice(adjectives).replace(" ", "%20")
         self.driver.get(url)
-        
+
         image_elements = self.driver.find_elements_by_class_name("container--3NC_b")
 
         image_urls = []

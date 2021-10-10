@@ -1,5 +1,6 @@
 from sys import argv
 from datetime import datetime
+from time import sleep
 from random import choice, choices, randint
 from math import floor
 from statistics import mean, stdev
@@ -78,7 +79,7 @@ def getRandomQuote():
 # strip out unwanted characters at the end
 def stripEndCharacters(text):
     output = text
-    chracters = [".", "!", "\"", "\'","“","”","‘","’","(",")","[","]"]
+    chracters = [".", "!", "\"", "\'","“","”","‘","’","(",")","[","]",":"]
     for char in chracters:
         output = output.replace(char, "")
     return output
