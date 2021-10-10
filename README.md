@@ -4,6 +4,8 @@ This bot generates imaginary albums following the rules of a game that was popul
 
 As it turns out, the fake reviews are funnier than the albums.
 
+The bot is on Twitter here: https://twitter.com/bot_album
+
 ## Dependencies
 
 `pip install unidecode selenium beautifulsoup4 pillow tweepy`
