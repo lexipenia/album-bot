@@ -44,6 +44,7 @@ class PhotoDownloader():
         url += "license=1%2C2%2C9%2C10&"        # modifications allowed
 
         self.driver.get(url)
+        sleep(1)    # required to avoid "stale element reference" when running remotely
         image_elements = self.driver.find_elements_by_class_name("overlay")
 
         # get the URLs of the specific image pages and choose one
@@ -67,6 +68,8 @@ class PhotoDownloader():
 
         url = "https://stocksnap.io/search/" + choice(adjectives).replace(" ", "%20")
         self.driver.get(url)
+
+        sleep(1)    # required to avoid "stale element reference" when running remotely
         
         image_elements = self.driver.find_elements_by_class_name("photo-grid-item")
 
@@ -90,7 +93,7 @@ class PhotoDownloader():
         url = "https://unsplash.com/s/photos/" + choice(adjectives).replace(" ", "%20")
         self.driver.get(url)
 
-        sleep(1)    # required for unsplash to avoid "stale element reference" when running remotely
+        sleep(1)    # required to avoid "stale element reference" when running remotely
         
         image_elements = self.driver.find_elements_by_class_name("oCCRx")
 
